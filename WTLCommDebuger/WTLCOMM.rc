@@ -126,22 +126,22 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "080403a8"
+        BLOCK "040904B0"
         BEGIN
-            VALUE "Comments", "使用WTL8.0 + 自用的CMyComm， 在VC2005 Express版下编译"
+            VALUE "Comments", "Built with WTL 10.0 + CMyComm"
             VALUE "CompanyName", "MySoft Inc."
-            VALUE "FileDescription", "串口调试器"
+            VALUE "FileDescription", "Serial Port Debuger"
             VALUE "FileVersion", "1,0,0,0"
             VALUE "InternalName", "CommDebuger.exe"
-            VALUE "LegalCopyright", "Copyright 2007, Mao yongjun"
+            VALUE "LegalCopyright", "Copyright 2007, Mao Eugene"
             VALUE "OriginalFilename", "WTLCommDebuger.exe"
-            VALUE "ProductName", "串口调试器"
+            VALUE "ProductName", "Serial Port Debuger"
             VALUE "ProductVersion", "1,0,0,0"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 2052, 936
+        VALUE "Translation", 0x0409, 1200
     END
 END
 

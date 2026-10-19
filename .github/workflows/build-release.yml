@@ -19,7 +19,7 @@ jobs:
     runs-on: windows-2022
     strategy:
       matrix:
-        configuration: [Release, Debug]
+        configuration: [Release]
         platform: [Win32, x64]
 
     steps:
