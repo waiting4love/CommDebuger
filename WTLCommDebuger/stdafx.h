@@ -13,16 +13,6 @@ extern CAppModule _Module;
 
 #include <atlwin.h>
 
-#if defined _M_IX86
-  #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
-#elif defined _M_IA64
-  #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='ia64' publicKeyToken='6595b64144ccf1df' language='*'\"")
-#elif defined _M_X64
-  #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64' publicKeyToken='6595b64144ccf1df' language='*'\"")
-#else
-  #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
-#endif
-
 #include <atlctrls.h>
 #include <atlcrack.h>
 #include <atlmisc.h>
@@ -33,9 +23,9 @@ extern CAppModule _Module;
 #include "Comm.h"
 
 /***************************************************
-* 类: GetStringFromID
-* 作用: 从资源ID中获取字符串
-* 用法: 把它当作函数 LPCTSTR GetStringFromID(ID)
+ * Name: GetStringFromID
+ * Desc: Load string by resource ID
+ * Return: string pointer; LPCTSTR GetStringFromID(ID)
 ****************************************************/
 struct GetStringFromID{    
 	TCHAR Buf[256];
@@ -52,9 +42,9 @@ struct GetStringFromID{
 };
 
 /***************************************************
-* 类: CFixedGroup
-* 作用: 解决GroupBox的父窗口指定为WS_CLIPCHILDREN时的自画问题
-* 用法: 将目标GroupBox子类化成CFixedGroup
+ * Name: CFixedGroup
+ * Desc: Subclass GroupBox to fix flicker with WS_CLIPCHILDREN
+ * Return: Use CFixedGroup to subclass GroupBox
 ****************************************************/
 class CFixedGroup
 	: public  CWindowImpl<CFixedGroup,CButton,CWinTraits<WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | BS_GROUPBOX | BS_TEXT> >
@@ -72,7 +62,7 @@ public:
 		RECT rect;
 		GetClientRect(&rect);
 
-		HBRUSH br = (HBRUSH)::GetClassLong(::GetParent(m_hWnd),GCL_HBRBACKGROUND);
+		HBRUSH br = (HBRUSH)::GetClassLongPtr(::GetParent(m_hWnd), GCLP_HBRBACKGROUND);
 		if(br == NULL) br = (HBRUSH)::GetSysColorBrush(COLOR_3DFACE);
 		CClientDC DC(m_hWnd);
 		DC.FillRect(&rect,br);

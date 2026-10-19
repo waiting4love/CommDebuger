@@ -75,6 +75,8 @@ public:
 		COMMAND_ID_HANDLER(IDC_BTN_OPTION, OnOptClick)
 		COMMAND_ID_HANDLER(IDC_BTN_EXIT, OnExit)
 
+		MESSAGE_HANDLER(WM_DPICHANGED, OnDpiChanged)
+
 		REFLECT_NOTIFICATIONS()
 		CHAIN_MSG_MAP(CDialogResize<CMainDlg>)
 
@@ -139,8 +141,10 @@ private:
 	LRESULT OnWritten(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnRead(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnSignal(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-	
+
 	void OnSizing(UINT fwSide, LPRECT pRect);
+
+	LRESULT OnDpiChanged(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/);
 
 	void OnClose();
 

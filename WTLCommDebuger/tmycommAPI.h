@@ -8,7 +8,7 @@
 #pragma warning (disable: 4800)   // disable BOOL->bool performance warning
 #pragma warning (disable: 4068)   // disable unknown pragma
 
-const unsigned long INVALIDTHREAD=(unsigned long)-1;
+const uintptr_t INVALIDTHREAD=(uintptr_t)-1;
 
 //---------------------------------------------------------------------------
 
@@ -735,7 +735,7 @@ private:
         	:hComm(_hComm),OnWrt(_OnWrt){;}
 	}WrtPps;
 
-	unsigned long hThread;
+	uintptr_t hThread;
     unsigned dwThreadID;
 
 	bool Opened(){
@@ -915,7 +915,7 @@ private:
         	:hComm(_hComm),OnRd(_OnRd),OnError(_OnErr),OnSignal(_OnSig){;}
     }RdPps;
 
-    unsigned long hThread;
+    uintptr_t hThread;
     unsigned dwThreadID;
 
 	bool Opened(){

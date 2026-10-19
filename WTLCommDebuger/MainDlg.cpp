@@ -252,12 +252,27 @@ LRESULT CMainDlg::OnCommOpen(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, B
 	}
 	else
 	{
+		// Validate that a port is selected
+		int iPortSel = m_cbPort.GetCurSel();
+		if (iPortSel < 0)
+		{
+			::MessageBox(m_hWnd, GetStringFromID(IDS_ERR_COMM_OPEN), NULL, MB_OK | MB_ICONERROR);
+			return 0;
+		}
+
 		int iBaudRate = GetDlgItemInt(IDC_CBB_BAUDRATE,NULL,FALSE);
 		int iByteSize = GetDlgItemInt(IDC_CBB_BYTESIZE,NULL,FALSE);
 		int iStopBits = m_cbStopBits.GetCurSel();
 		int iParity = m_cbParity.GetCurSel();
 
 		int iFlowCtrl = m_cbFlowCtrl.GetCurSel();
+
+		// Validate combo box selections
+		if (iBaudRate <= 0 || iByteSize <= 0 || iStopBits < 0 || iParity < 0 || iFlowCtrl < 0)
+		{
+			::MessageBox(m_hWnd, GetStringFromID(IDS_ERR_COMM_PARAMS), NULL, MB_OK | MB_ICONERROR);
+			return 0;
+		}
 
 		if(
 			(iByteSize ==5)&&(iStopBits==2) ||
@@ -268,7 +283,7 @@ LRESULT CMainDlg::OnCommOpen(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, B
 			return 0;
 		}
 		
-		CSerialPortInfo* info = (CSerialPortInfo*)m_cbPort.GetItemDataPtr(m_cbPort.GetCurSel());
+		CSerialPortInfo* info = (CSerialPortInfo*)m_cbPort.GetItemDataPtr(iPortSel);
 		if (info == nullptr)
 		{
 			::MessageBox(m_hWnd, GetStringFromID(IDS_ERR_COMM_OPEN), NULL, MB_OK | MB_ICONERROR);
@@ -428,7 +443,7 @@ LRESULT CMainDlg::OnRead(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 		DWORD Len = (DWORD)lParam;
 
 		CString S;
-		if(m_pnlRecv.m_chkHex.GetCheck() == BST_CHECKED)  // 16进制显示
+		if(m_pnlRecv.m_chkHex.GetCheck() == BST_CHECKED)  // Hex display
 		{
 			for(DWORD i=0; i<Len; i++)
 			{
@@ -437,7 +452,7 @@ LRESULT CMainDlg::OnRead(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 				S = S + AddStr;
 			}
 		}
-		else if(m_CommOpts.bCtrlChar)  // 控制符改成[xx]
+		else if(m_CommOpts.bCtrlChar)  // Show control chars as [xx]
 		{
 			S = CString(Buf,Len);
 
@@ -453,12 +468,12 @@ LRESULT CMainDlg::OnRead(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 				}
 			}			
 		}
-		else  // 普通模式
+		else  // Normal mode
 		{
 			S = CString(Buf,Len);
 		}
 		
-		// 是否定位当前位置
+		// Save or keep current position
 		DWORD dwCurSel = m_pnlRecv.m_edtText.GetSel();
 		m_pnlRecv.m_edtText.AppendText(S,TRUE);
 		if( !m_CommOpts.bLastPos )
@@ -466,7 +481,7 @@ LRESULT CMainDlg::OnRead(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 			m_pnlRecv.m_edtText.SetSel(dwCurSel,TRUE);	
 		}
 
-		// 自动保存
+		// Auto save
 		if(m_CommOpts.bAutoSave && m_CommOpts.dCharCount>0 && m_CommOpts.szFileName[0]>='0')
 		{
 			DWORD len = ::GetWindowTextLengthA(m_pnlRecv.m_edtText);
@@ -483,7 +498,7 @@ LRESULT CMainDlg::OnRead(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled
 					delete []data;
 					::CloseHandle(fh);
 
-					m_pnlRecv.m_edtText.SetWindowText(_T(""));   // 保存完后清空文本框
+					m_pnlRecv.m_edtText.SetWindowText(_T(""));   // Clear received text
 				}
 			}
 		}
@@ -549,4 +564,27 @@ void CMainDlg::OnSizing(UINT fwSide, LPRECT pRect)
 {
 	if(pRect->right - pRect->left < 530) pRect->right = pRect->left + 530;
 	if(pRect->bottom - pRect->top < 450)  pRect->bottom = pRect->top + 450;	
+}
+
+LRESULT CMainDlg::OnDpiChanged(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+{
+	// wParam = MAKELONG(newDpiY, newDpiX); lParam = LPRECT suggested new window rect
+	// Resize the window to the suggested rectangle so the dialog scales with the new DPI.
+	const LPRECT pSuggested = reinterpret_cast<LPRECT>(lParam);
+	if (pSuggested != NULL)
+	{
+		UINT newDpiX = LOWORD(wParam);
+		UINT newDpiY = HIWORD(wParam);
+		(void)newDpiX; (void)newDpiY;
+
+		// Enforce minimum size constraints consistent with OnSizing
+		RECT rc = *pSuggested;
+		if (rc.right - rc.left < 530) rc.right = rc.left + 530;
+		if (rc.bottom - rc.top < 450)  rc.bottom = rc.top + 450;
+
+		::SetWindowPos(m_hWnd, NULL, rc.left, rc.top,
+			rc.right - rc.left, rc.bottom - rc.top,
+			SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+	return 0;
 }

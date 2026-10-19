@@ -1,7 +1,8 @@
 
 #pragma once
-#include <atldlgs.h> 
+#include <atldlgs.h>
 #include <vector>
+#include "SystemFonts.h"
 #define AUTO_SEND_TIMER 3724
 class CSendPanel 
 	: public CDialogImpl<CSendPanel>,
@@ -70,7 +71,9 @@ private:
 		
 		m_edtText.SetLimitText(0);
 
-		m_fntText.CreatePointFont(90,GetStringFromID(IDS_SWFONT));
+		LOGFONT lf;
+		GetSystemMonospaceFontLogFont(lf);
+		m_fntText.CreateFontIndirect(&lf);
 		m_edtText.SetFont(m_fntText);
 
 		m_edtText.SetWindowText(GetStringFromID(IDS_SEND_INIT));
